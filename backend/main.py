@@ -63,7 +63,8 @@ def calculate_trust_score(repo_url):
         resp = requests.get(api_url, headers=headers) 
 
         if resp.status_code != 200:
-            return {"score": 0, "grade": "Unknown", "details": "Could not fetch metadata"}
+            # CHANGE THIS LINE to show the actual error code:
+            return {"score": 0, "grade": "Unknown", "details": f"GitHub Error {resp.status_code}: {resp.reason}"}
         
         data = resp.json()
         
