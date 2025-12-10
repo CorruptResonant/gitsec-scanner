@@ -52,12 +52,22 @@ def calculate_trust_score(repo_url):
         owner, repo_name = parts[-2], parts[-1]
         
         api_url = f"https://api.github.com/repos/{owner}/{repo_name}"
-        resp = requests.get(api_url)
+        
+        # --- AUTHENTICATION LOGIC ---
+        headers = {}
+        github_token = os.environ.get("GITHUB_TOKEN")
+        if github_token:
+            headers["Authorization"] = f"Bearer {github_token}"
+        
+        # --- API CALL ---
+        resp = requests.get(api_url, headers=headers) 
+
         if resp.status_code != 200:
             return {"score": 0, "grade": "Unknown", "details": "Could not fetch metadata"}
         
         data = resp.json()
         
+        # --- SCORING LOGIC ---
         created_at = datetime.strptime(data["created_at"], "%Y-%m-%dT%H:%M:%SZ")
         age_years = (datetime.now() - created_at).days / 365
         age_score = min(30, age_years * 10)
